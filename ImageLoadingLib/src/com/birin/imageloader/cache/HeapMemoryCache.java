@@ -30,20 +30,28 @@ public class HeapMemoryCache {
 	private static final String TAG = HeapMemoryCache.class.getSimpleName();
 
 	private static final float CACHE_HEAP_PERCENT = 0.2f;
-	private final static float LOAD_FACTOR = 1.5f;
+	private static final float LOAD_FACTOR = 1.5f;
 
-	private final static int INITIAL_MAP_CAPACITY = 10;
+	private static final int INITIAL_MAP_CAPACITY = 10;
 
 	private long currentCacheSize = 0;
 	private long maxAllowedCacheSize = 0;
 
+	private static HeapMemoryCache heapMemoryCache;
 	private Map<String, Bitmap> cache = Collections
 			.synchronizedMap(new LinkedHashMap<String, Bitmap>(
 					INITIAL_MAP_CAPACITY, LOAD_FACTOR, true));
 
-	public HeapMemoryCache() {
+	private HeapMemoryCache() {
 		// use 20% of available heap memory
 		setLimit((long) (Runtime.getRuntime().maxMemory() * CACHE_HEAP_PERCENT));
+	}
+
+	public static synchronized HeapMemoryCache getHeapMemoryCache() {
+		if (heapMemoryCache == null) {
+			heapMemoryCache = new HeapMemoryCache();
+		}
+		return heapMemoryCache;
 	}
 
 	public void setLimit(long limit) {
@@ -107,6 +115,7 @@ public class HeapMemoryCache {
 				size = bitmap.getByteCount();
 			}
 		}
+		System.out.println("biraj getBitmapSizeInBytes " + size);
 		return size;
 	}
 
