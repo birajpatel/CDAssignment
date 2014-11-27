@@ -6,6 +6,7 @@ import java.util.concurrent.Executors;
 import android.content.Context;
 import android.graphics.Bitmap;
 
+import com.birin.imageloader.cache.DiskCache;
 import com.birin.imageloader.cache.HeapMemoryCache;
 import com.birin.imageloader.utils.ImageData;
 import com.birin.imageloader.utils.RequestStore;
@@ -119,5 +120,27 @@ public class ImageLoader {
 			executorService.submit(new BitmapGetter(context, imageData,
 					cacheDirectoryName));
 		}
+	}
+
+	/**
+	 * Clears the folder present on disk.
+	 */
+	public void clearDiskCache() {
+		new DiskCache(context, cacheDirectoryName).clear();
+	}
+
+	/**
+	 * Clears the cache loaded on heap memory.
+	 */
+	public void clearHeapCache() {
+		HeapMemoryCache.getHeapMemoryCache().clear();
+	}
+
+	/**
+	 * Clears both memory & disk cache.
+	 */
+	public void clearAllCache() {
+		clearDiskCache();
+		clearHeapCache();
 	}
 }
