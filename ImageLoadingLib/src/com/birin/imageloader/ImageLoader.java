@@ -5,20 +5,18 @@ import java.util.concurrent.Executors;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.util.DisplayMetrics;
-import android.util.Log;
-import android.widget.ImageView;
 
 import com.birin.imageloader.cache.HeapMemoryCache;
 import com.birin.imageloader.utils.ImageData;
 import com.birin.imageloader.utils.RequestStore;
+import com.birin.imageloader.utils.Utils;
 import com.birin.imageloader.workers.BitmapGetter;
 
-// References
-// http://www.vogella.com/tutorials/JavaConcurrency/article.html#threadpools
-// http://stackoverflow.com/questions/12191029/running-two-independent-tasks-simultaneously-using-threads
-// https://github.com/nostra13/Android-Universal-Image-Loader/blob/master/library/src/com/nostra13/
-// universalimageloader/core/ImageLoader.java
+/**
+ * This is the main Image loader class, which handles the display image method,
+ * To display image {@link #init(ImageLoaderConfiguration)} needs to be called &
+ * configure the loader for next time usages.
+ */
 public class ImageLoader {
 
 	public static final String TAG = ImageLoader.class.getSimpleName();
@@ -34,7 +32,11 @@ public class ImageLoader {
 
 	}
 
-	public static ImageLoader getInstance() {
+	/**
+	 * Initializes ImageLoader instance, after calling this method configuration
+	 * need to be set using {@link #init(ImageLoaderConfiguration)} method.
+	 */
+	public synchronized static ImageLoader getInstance() {
 		if (instance == null) {
 			synchronized (ImageLoader.class) {
 				if (instance == null) {
@@ -49,8 +51,6 @@ public class ImageLoader {
 	 * Initializes ImageLoader instance with configuration.<br />
 	 * If configurations was set before ( {@link #isInited()} == true) then this
 	 * method does nothing.<br />
-	 * To force initialization with new configuration you should
-	 * {@linkplain #destroy() destroy ImageLoader} at first.
 	 * 
 	 * @param configuration
 	 *            {@linkplain ImageLoaderConfiguration ImageLoader
@@ -70,7 +70,7 @@ public class ImageLoader {
 			this.executorService = Executors
 					.newFixedThreadPool(configuration.threadPoolSize);
 		} else {
-			Log.w(TAG, "Re-Init attempt");
+			Utils.warn(TAG, "Re-Init-Attempt-Ignore");
 		}
 	}
 
@@ -96,30 +96,28 @@ public class ImageLoader {
 		}
 	}
 
-	public void displayImage(String imageUrl, ImageView imageView) {
+	/**
+	 * Checks if ImageLoader's configuration was initialized & sets image in
+	 * below steps. 1. Check in heap cache & set bitmap if available. 2. Queue
+	 * the request in executor for SD card/ From server loading.
+	 * 
+	 * @param ImageData
+	 *            image-data that needs to be loaded.
+	 * @throws IllegalStateException
+	 *             if imagedata is null.
+	 */
+	public void displayImage(ImageData imageData) {
+		if (null == imageData) {
+			throw new IllegalArgumentException("Image data can not be null");
+		}
 		ensureConfiguration();
-		RequestStore.getInstance().putRequest(imageUrl, imageView);
-		Bitmap bitmap = HeapMemoryCache.getHeapMemoryCache().get(imageUrl);
-		if (bitmap != null)
-			imageView.setImageBitmap(bitmap);
-		else {
-			ImageData imageData = new ImageData(imageUrl, imageView);
-			imageData.setRequiredDimentions(imageView.getLayoutParams().width,
-					imageView.getLayoutParams().height);
+		RequestStore.getInstance().putRequest(imageData);
+		Bitmap bitmap = HeapMemoryCache.getHeapMemoryCache().get(imageData.url);
+		if (bitmap != null) {
+			imageData.imageView.setImageBitmap(bitmap);
+		} else {
 			executorService.submit(new BitmapGetter(context, imageData,
 					cacheDirectoryName));
 		}
-	}
-
-	public static int getDeviceWidth(Context context) {
-		DisplayMetrics displaymetrics = context.getResources()
-				.getDisplayMetrics();
-		return displaymetrics.widthPixels;
-	}
-
-	public static int getDeviceHeight(Context context) {
-		DisplayMetrics displaymetrics = context.getResources()
-				.getDisplayMetrics();
-		return displaymetrics.heightPixels;
 	}
 }

@@ -2,13 +2,15 @@ package com.birin.imageloader;
 
 import android.content.Context;
 
-// Reference
-// https://github.com/nostra13/Android-Universal-Image-Loader
-// /blob/master/library/src/com/nostra13/universalimageloader/core/ImageLoaderConfiguration.java
+/**
+ * This class is a model class for configuring image loader instance, useful to
+ * configure the loader in custom way, for default value use
+ * {@link #createDefault(Context)} method.
+ */
 public class ImageLoaderConfiguration {
 
 	public static final int DEFAULT_THREAD_POOL_SIZE = 3;
-	public static final String DEFAULT_CACHE_DIR = "Cache";
+	public static final String DEFAULT_CACHE_DIR = ".Cache";
 
 	Context context;
 	int threadPoolSize = DEFAULT_THREAD_POOL_SIZE;
@@ -24,6 +26,9 @@ public class ImageLoaderConfiguration {
 		return new Builder(context).build();
 	}
 
+	/**
+	 * Builder to build config instance.
+	 */
 	public static class Builder {
 
 		private Context context;
@@ -51,6 +56,9 @@ public class ImageLoaderConfiguration {
 			return this;
 		}
 
+		/**
+		 * Builds the config object using this builder.
+		 */
 		public ImageLoaderConfiguration build() {
 			return new ImageLoaderConfiguration(this);
 		}

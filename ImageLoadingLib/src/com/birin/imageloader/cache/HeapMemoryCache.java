@@ -12,6 +12,8 @@ import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.birin.imageloader.utils.Utils;
+
 /**
  * Class that is responsible for pointing to the bitmap cache which will be
  * stored on heap memory, we will limit this cache to around
@@ -19,12 +21,6 @@ import android.util.Log;
  * putting the new bitmap it will remove least recently used bitmaps from memory
  * to ensure that heap max is not reached.
  */
-
-// References :
-// http://stackoverflow.com/questions/2630158/detect-application-heap-size-in-android
-// http://www.java2s.com/Code/Java/Collections-Data-Structure/ImplementingaLeastRecentlyUsedLRUCache.htm
-// http://codereview.stackexchange.com/questions/3138/linkedhashmap-as-lru-cache
-// http://stackoverflow.com/questions/2407565/bitmap-byte-size-after-decoding
 public class HeapMemoryCache {
 
 	private static final String TAG = HeapMemoryCache.class.getSimpleName();
@@ -54,10 +50,22 @@ public class HeapMemoryCache {
 		return heapMemoryCache;
 	}
 
+	/**
+	 * Limit for our mem-cache.
+	 * 
+	 * @param limit
+	 *            in bytes.
+	 */
 	public void setLimit(long limit) {
 		maxAllowedCacheSize = limit;
 	}
 
+	/**
+	 * Tries to retrieve the bitmap from cache.
+	 * 
+	 * @param url
+	 * @return Bitmap if available in mem-cache.
+	 */
 	public Bitmap get(String url) {
 		if (null != cache && TextUtils.isEmpty(url) == false
 				&& cache.containsKey(url)) {
@@ -86,7 +94,7 @@ public class HeapMemoryCache {
 	 * less than max allowed size.
 	 */
 	private void cleanLRUsedBitmaps() {
-		Log.i(TAG, "CurrentCacheSize = " + currentCacheSize + " length="
+		Log.i(TAG, "Current cacheSize = " + currentCacheSize + " length="
 				+ cache.size());
 		Iterator<Entry<String, Bitmap>> lruIterator = cache.entrySet()
 				.iterator();
@@ -115,7 +123,7 @@ public class HeapMemoryCache {
 				size = bitmap.getByteCount();
 			}
 		}
-		System.out.println("biraj getBitmapSizeInBytes " + size);
+		Utils.log(TAG, "getBitmapSizeInBytes " + size);
 		return size;
 	}
 

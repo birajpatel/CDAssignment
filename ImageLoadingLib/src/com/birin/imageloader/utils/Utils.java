@@ -4,7 +4,26 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import android.util.Log;
+
+/**
+ * General utilities.
+ */
 public class Utils {
+
+	public static final boolean DEBUG = true;
+
+	public static void log(String tag, String log) {
+		if (DEBUG) {
+			Log.i(tag, log);
+		}
+	}
+
+	public static void warn(String tag, String log) {
+		if (DEBUG) {
+			Log.w(tag, log);
+		}
+	}
 
 	/**
 	 * Copies data from IS to OS in chunks of 1024 bytes.

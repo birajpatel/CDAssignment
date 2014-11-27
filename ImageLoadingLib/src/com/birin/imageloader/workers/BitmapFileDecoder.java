@@ -8,10 +8,17 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
 import com.birin.imageloader.utils.ImageData;
+import com.birin.imageloader.utils.Utils;
 
-// Reference
-// http://developer.android.com/training/displaying-bitmaps/load-bitmap.html
+/**
+ * 
+ * Decodes the file from given file object, also while decoding considers the
+ * required height,width by calculating the inSampleSize
+ * 
+ */
 public class BitmapFileDecoder {
+
+	private static final String TAG = BitmapFileDecoder.class.getSimpleName();
 
 	public Bitmap decodeFile(File file, int requiredWidth, int requiredHeight)
 			throws IOException {
@@ -39,33 +46,33 @@ public class BitmapFileDecoder {
 		return bitmap;
 	}
 
+	/**
+	 * Calculates max power of 2 which is inSampleSize for decoding bitmap.
+	 */
 	public static int calculateInSampleSize(BitmapFactory.Options options,
 			int requiredWidth, int requiredHeight) {
 		final int REQUIRED_WT = Math.min(requiredWidth,
 				ImageData.MAX_IMAGE_WT_HT);
 		final int REQUIRED_HT = Math.min(requiredHeight,
 				ImageData.MAX_IMAGE_WT_HT);
-		System.out.println("biraj REQUIRED_WT " + REQUIRED_WT + " HT "
-				+ REQUIRED_HT);
 		final int height = options.outHeight;
 		final int width = options.outWidth;
 		int inSampleSize = 1;
-		System.out.println("biraj height " + height + " width " + width);
+		Utils.log(TAG, "Required WT " + REQUIRED_WT + " HT " + REQUIRED_HT);
 		if (height > REQUIRED_HT || width > REQUIRED_WT) {
 
 			final int halfHeight = height / 2;
 			final int halfWidth = width / 2;
 
 			// Calculate the largest inSampleSize value that is a power of 2 and
-			// keeps both
-			// height and width larger than the requested height and width.
+			// keeps both height and width larger than the requested height and
+			// width.
 			while ((halfHeight / inSampleSize) > REQUIRED_HT
 					&& (halfWidth / inSampleSize) > REQUIRED_WT) {
 				inSampleSize *= 2;
 			}
 		}
-
-		System.out.println("Biraj inSampleSize " + inSampleSize);
+		Utils.log(TAG, "inSampleSize " + inSampleSize);
 		return inSampleSize;
 	}
 }

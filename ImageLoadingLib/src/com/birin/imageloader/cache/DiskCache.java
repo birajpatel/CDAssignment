@@ -9,7 +9,6 @@ import android.os.Environment;
  * Class that is responsible for pointing to the image cache which will be
  * stored on disk.
  */
-// http://stackoverflow.com/questions/22421686/android-programming-write-file-to-internal-storage
 public class DiskCache {
 
 	private File imageCacheFolder;
@@ -37,8 +36,8 @@ public class DiskCache {
 	}
 
 	/**
-	 * Generates unique file name for given URL, hash-code for practical
-	 * purposes hash-codes are unique.
+	 * Generates unique file name for given URL, for practical purposes
+	 * hash-codes are considered unique.
 	 */
 	public File getFileForUrl(String url) {
 		String filename = String.valueOf(url.hashCode());
